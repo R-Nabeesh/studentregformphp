@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration Form</title>
+    <style>
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<?php
+// Define variables and set to empty values
+$nameErr = $emailErr = $rollNumberErr = $passwordErr = "";
+$name = $email = $rollNumber = $password = "";
+
+// Function to sanitize and validate input data
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Process form data on submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate name
+    if (empty($_POST["name"])) {
+        $nameErr = "Name is required";
+    } else {
+        $name = sanitize_input($_POST["name"]);
+        // Check if name contains only letters and whitespace
+        if (!preg_match("/^[a-zA-Z ]*$/", $name)) {
+            $nameErr = "Only letters and white space allowed";
+        }
+    }
+
+    // Validate email
+    if (empty($_POST["email"])) {
+        $emailErr = "Email is required";
+    } else {
+        $email = sanitize_input($_POST["email"]);
+        // Check if email is valid
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emailErr = "Invalid email format";
+        }
+    }
+
+    // Validate roll number
+    if (empty($_POST["rollNumber"])) {
+        $rollNumberErr = "Roll number is required";
+    } else {
+        $rollNumber = sanitize_input($_POST["rollNumber"]);
+        // Check if roll number is numeric
+        if (!is_numeric($rollNumber)) {
+            $rollNumberErr = "Roll number should be numeric";
+        }
+    }
+
+    // Validate password
+    if (empty($_POST["password"])) {
+        $passwordErr = "Password is required";
+    } else {
+        $password = sanitize_input($_POST["password"]);
+        // Password validation rules
+        $uppercase = preg_match('@[A-Z]@', $password);
+        $lowercase = preg_match('@[a-z]@', $password);
+        $number = preg_match('@[0-9]@', $password);
+        if (!$uppercase || !$lowercase || !$number || strlen($password) < 8) {
+            $passwordErr = "Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number";
+        }
+    }
+}
+?>
+
+<h2>Student Registration Form</h2>
+<p><span class="error">* required field</span></p>
+<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+    <label>Name:</label>
+    <input type="text" name="name" value="<?php echo $name; ?>">
+    <span class="error">* <?php echo $nameErr; ?></span>
+    <br><br>
+    <label>Email:</label>
+    <input type="text" name="email" value="<?php echo $email; ?>">
+    <span class="error">* <?php echo $emailErr; ?></span>
+    <br><br>
+    <label>Roll Number:</label>
+    <input type="text" name="rollNumber" value="<?php echo $rollNumber; ?>">
+    <span class="error">* <?php echo $rollNumberErr; ?></span>
+    <br><br>
+    <label>Password:</
